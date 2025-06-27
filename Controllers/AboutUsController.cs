@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using cms_api.Extension;
 using cms_api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +44,7 @@ namespace cms_api.Controllers
                     { "imageBgUrl", value.imageBgUrl },
                     { "imageLogoUrl", value.imageLogoUrl },
                     { "description", value.description.ConvertStrToHtml() },
+                    { "descriptionEN", value.descriptionEN.ConvertStrToHtml() },
                     { "latitude", value.latitude},
                     { "longitude", value.longitude},
                     { "address", value.address},
@@ -52,6 +54,16 @@ namespace cms_api.Controllers
                     { "site", value.site},
                     { "facebook", value.facebook},
                     { "lineOfficial", value.lineOfficial},
+                    { "vision", value.vision },
+                    { "visionEN", value.visionEN },
+                    { "missionList", new BsonArray(
+                        value.missionList.Select((m, index) => new BsonDocument
+                        {
+                            { "sequence", index + 1 },
+                            { "title", m.title },
+                            { "titleEN", m.titleEN }
+                        }))
+                    },
                     { "youtube", value.youtube},
                     { "createBy", value.updateBy },
                     { "createDate", DateTime.Now.toStringFromDate() },
@@ -85,7 +97,7 @@ namespace cms_api.Controllers
                 //if (!string.IsNullOrEmpty(value.code)) { filter = filter & Builders<AboutUs>.Filter.Eq("code", value.code); }
                 if (!string.IsNullOrEmpty(codeCenter)) { filter = filter & Builders<AboutUs>.Filter.Eq("center", codeCenter); }
                 else { filter = filter & Builders<AboutUs>.Filter.Eq("center", ""); }
-                var docs = col.Find(filter).Project(c => new { c.code, c.isActive, c.title,c.titleEN, c.imageLogoUrl, c.imageBgUrl, c.description, c.latitude, c.email, c.site, c.longitude, c.address,c.addressEN, c.facebook, c.youtube, c.telephone, c.createBy, c.createDate, c.updateBy, c.updateDate, c.lineOfficial }).ToList();
+                var docs = col.Find(filter).Project(c => new { c.code, c.isActive, c.title,c.titleEN, c.imageLogoUrl, c.imageBgUrl, c.description, c.latitude, c.email, c.site, c.longitude, c.address,c.addressEN, c.facebook, c.youtube, c.telephone, c.createBy, c.createDate, c.updateBy, c.updateDate, c.lineOfficial, missionList = c.missionList.Select(x => new {sequence = x.sequence, title = x.title, titleEN = x.titleEN} ) }).ToList();
                 return new Response { status = "S", message = "success", jsonData = docs.ToJson(), objectData = docs };
             }
             catch (Exception ex)
@@ -114,6 +126,7 @@ namespace cms_api.Controllers
                     doc["imageBgUrl"] = value.imageBgUrl ?? "";
                     doc["imageLogoUrl"] = value.imageLogoUrl ?? "";
                     doc["description"] = value.description.ConvertStrToHtml() ?? "";
+                    doc["descriptionEN"] = value.descriptionEN.ConvertStrToHtml() ?? "";
                     doc["latitude"] = value.latitude ?? "";
                     doc["longitude"] = value.longitude ?? "";
                     doc["address"] = value.address ?? "";
@@ -125,6 +138,15 @@ namespace cms_api.Controllers
                     doc["youtube"] = value.youtube ?? "";
                     doc["site"] = value.site ?? "";
                     doc["updateBy"] = value.updateBy ?? "";
+                    doc["vision"] = value.vision ?? "";
+                    doc["visionEN"] = value.visionEN ?? "";
+                    doc["missionList"] = new BsonArray(
+                        value.missionList.Select((m, index) => new BsonDocument
+                        {
+                            { "sequence", index + 1 },
+                            { "title", m.title },
+                            { "titleEN", m.titleEN }
+                        }));
 
                     doc["updateDate"] = DateTime.Now.toStringFromDate();
                     doc["updateTime"] = DateTime.Now.toTimeStringFromDate();
@@ -140,6 +162,7 @@ namespace cms_api.Controllers
                         { "imageLogoUrl", value.imageLogoUrl  ?? ""},
                         { "imageBgUrl", value.imageBgUrl  ?? ""},
                         { "description", value.description.ConvertStrToHtml()  ?? ""},
+                        { "descriptionEN", value.descriptionEN.ConvertStrToHtml()  ?? ""},
                         { "latitude", value.latitude  ?? ""},
                         { "longitude", value.longitude  ?? ""},
                         { "address", value.address  ?? ""},
@@ -148,6 +171,16 @@ namespace cms_api.Controllers
                         { "site", value.site  ?? ""},
                         { "facebook", value.facebook  ?? ""},
                         { "lineOfficial", value.lineOfficial  ?? ""},
+                        { "vision", value.vision  ?? ""},
+                        { "visionEN", value.visionEN  ?? ""},
+                        { "missionList", new BsonArray(
+                            value.missionList.Select((m, index) => new BsonDocument
+                            {
+                                { "sequence", index + 1 },
+                                { "title", m.title },
+                                { "titleEN", m.titleEN }
+                            }))
+                        },
                         { "youtube", value.youtube  ?? ""},
                         { "createDate", DateTime.Now.toStringFromDate() },
                         { "docDate", DateTime.Now },

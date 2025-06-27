@@ -1,38 +1,41 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using cms_api.Extension;
 using cms_api.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Newtonsoft.Json;
+
+// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace cms_api.Controllers
 {
     [Route("[controller]")]
-    public class ProductController : Controller
+    public class PortfolioController : Controller
     {
-        public ProductController() { }
+        public PortfolioController() { }
+
 
         #region main
 
         // POST /create
         [HttpPost("create")]
-        public ActionResult<Response> Create([FromBody] Product value)
+        public ActionResult<Response> Create([FromBody] Portfolio value)
         {
             try
             {
-                new Criteria { code = value.code, title = value.title, updateBy = value.updateBy }.WriteLog("Create", "product");
+                new Criteria { code = value.code, title = value.title, updateBy = value.updateBy }.WriteLog("Create", "portfolio");
             }
             catch { }
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient( "product");
-                var colRegister = new Database().MongoClient<Register>( "register");
+                var col = new Database().MongoClient("portfolio");
+                var colRegister = new Database().MongoClient<Register>("register");
 
                 //check duplicate
                 value.code = "".toCode();
@@ -58,7 +61,11 @@ namespace cms_api.Controllers
                     { "sequence", value.sequence },
                     { "title", value.title },
                     { "titleEN", value.titleEN },
+                    { "progress", value.progress },
                     { "imageUrl", value.imageUrl },
+                    { "imageBanner", value.imageBanner },
+                    { "imageExample", value.imageExample },
+                    { "functionList", value.functionList },
                     { "category", value.category },
                     { "language", value.language },
                     { "description", value.description.ConvertStrToHtml() },
@@ -80,6 +87,7 @@ namespace cms_api.Controllers
                     { "isHighlight", value.isHighlight },
                     { "isNotification", value.isNotification },
                     { "status", value.isActive ? "A" : "N" },
+                    { "status2", value.status2 },
                     { "lv0", value.lv0 },
                     { "lv1", value.lv1 },
                     { "lv2", value.lv2 },
@@ -91,7 +99,7 @@ namespace cms_api.Controllers
                 if (value.isNotification)
                 {
                     new NotificationController().CreateSend(new NotificationSend { username = value.updateBy, category = value.category, reference = value.code });
-                    _ = new NotificationController().PushTopics(new Notification { to = "/topics/all", title = value.title, description = value.description, data = new DataPush { page = "product", code = value.code } });
+                    _ = new NotificationController().PushTopics(new Notification { to = "/topics/all", title = value.title, description = value.description, data = new DataPush { page = "portfolio", code = value.code } });
                 }
 
                 return new Response { status = "S", message = "success", jsonData = doc.ToJson(), objectData = BsonSerializer.Deserialize<object>(doc) };
@@ -108,52 +116,52 @@ namespace cms_api.Controllers
         {
             try
             {
-                new Criteria { code = value.code, title = value.title, updateBy = value.updateBy }.WriteLog("Read", "product");
+                new Criteria { code = value.code, title = value.title, updateBy = value.updateBy }.WriteLog("Read", "portfolio");
             }
             catch { }
 
             try
             {
-                var col = new Database().MongoClient<Product>("product");
-                var filter = Builders<Product>.Filter.Ne("status", "D");
+                var col = new Database().MongoClient<Portfolio>("portfolio");
+                var filter = Builders<Portfolio>.Filter.Ne("status", "D");
 
                 if (!string.IsNullOrEmpty(value.keySearch))
                 {
-                    filter = (filter & Builders<Product>.
-                        Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i"))) | (filter & Builders<Product>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i")));
+                    filter = (filter & Builders<Portfolio>.
+                        Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i"))) | (filter & Builders<Portfolio>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i")));
 
                     if (value.permission != "all")
-                        filter &= (value.permission.filterPermission<Product>("category"));
+                        filter &= (value.permission.filterPermission<Portfolio>("category"));
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(value.category))
-                        filter &= Builders<Product>.Filter.Eq("category", value.category);
+                        filter &= Builders<Portfolio>.Filter.Eq("category", value.category);
                     else
                         if (value.permission != "all")
-                        filter &= (value.permission.filterPermission<Product>("category"));
+                        filter &= (value.permission.filterPermission<Portfolio>("category"));
 
-                    if (!string.IsNullOrEmpty(value.code)) { filter &= Builders<Product>.Filter.Eq("code", value.code); }
-                    if (!string.IsNullOrEmpty(value.status)) { filter = filter & Builders<Product>.Filter.Eq("status", value.status); }
-                    if (!string.IsNullOrEmpty(value.createBy)) { filter = filter & Builders<Product>.Filter.Eq("createBy", value.createBy); }
-                    if (!string.IsNullOrEmpty(value.title)) { filter = filter & Builders<Product>.Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.title), "i")); }
-                    if (!string.IsNullOrEmpty(value.description)) { filter = filter & Builders<Product>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.description), "i")); }
+                    if (!string.IsNullOrEmpty(value.code)) { filter &= Builders<Portfolio>.Filter.Eq("code", value.code); }
+                    if (!string.IsNullOrEmpty(value.status)) { filter = filter & Builders<Portfolio>.Filter.Eq("status", value.status); }
+                    if (!string.IsNullOrEmpty(value.createBy)) { filter = filter & Builders<Portfolio>.Filter.Eq("createBy", value.createBy); }
+                    if (!string.IsNullOrEmpty(value.title)) { filter = filter & Builders<Portfolio>.Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.title), "i")); }
+                    if (!string.IsNullOrEmpty(value.description)) { filter = filter & Builders<Portfolio>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.description), "i")); }
                     //if (!string.IsNullOrEmpty(value.language)) { filter = filter & Builders<Product>.Filter.Regex("language", value.language); }
-                    if (!string.IsNullOrEmpty(value.sequence)) { int sequence = Int32.Parse(value.sequence); filter = filter & Builders<Product>.Filter.Eq("sequence", sequence); }
+                    if (!string.IsNullOrEmpty(value.sequence)) { int sequence = Int32.Parse(value.sequence); filter = filter & Builders<Portfolio>.Filter.Eq("sequence", sequence); }
 
                     var ds = value.startDate.toDateFromString().toBetweenDate();
                     var de = value.endDate.toDateFromString().toBetweenDate();
-                    if (value.startDate != "Invalid date" && value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate) && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Product>.Filter.Gt("docDate", ds.start) & Builders<Product>.Filter.Lt("docDate", de.end); }
-                    else if (value.startDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate)) { filter = filter & Builders<Product>.Filter.Gt("docDate", ds.start) & Builders<Product>.Filter.Lt("docDate", ds.end); }
-                    else if (value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Product>.Filter.Gt("docDate", de.start) & Builders<Product>.Filter.Lt("docDate", de.end); }
+                    if (value.startDate != "Invalid date" && value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate) && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Portfolio>.Filter.Gt("docDate", ds.start) & Builders<Portfolio>.Filter.Lt("docDate", de.end); }
+                    else if (value.startDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate)) { filter = filter & Builders<Portfolio>.Filter.Gt("docDate", ds.start) & Builders<Portfolio>.Filter.Lt("docDate", ds.end); }
+                    else if (value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Portfolio>.Filter.Gt("docDate", de.start) & Builders<Portfolio>.Filter.Lt("docDate", de.end); }
 
                 }
 
                 //var docs = col.Find(filter).SortByDescending(o => o.docDate).Skip(value.skip).Limit(value.limit).Project(c => new { c.code, c.isActive, c.createBy, c.createDate, c.description, c.descriptionEN, c.titleEN, c.imageUrl, c.title, c.language, c.updateBy, c.updateDate, c.view, c.createTime, c.updateTime, c.docDate, c.docTime, c.category, c.sequence, c.status, c.lv0, c.lv1, c.lv2, c.lv3 }).ToList();
 
-                List<Product> docs = col.Aggregate().Match(filter).SortByDescending(o => o.docDate).ThenByDescending(o => o.updateTime).Skip(value.skip).Limit(value.limit)
-                                      .Lookup("productCategory", "category", "code", "categoryList")
-                                      .As<Product>()
+                List<Portfolio> docs = col.Aggregate().Match(filter).SortByDescending(o => o.docDate).ThenByDescending(o => o.updateTime).Skip(value.skip).Limit(value.limit)
+                                      .Lookup("portfolioCategory", "category", "code", "categoryList")
+                                      .As<Portfolio>()
                                       .ToList();
 
                 return new Response { status = "S", message = "success", objectData = docs, totalData = col.Find(filter).ToList().Count() };
@@ -166,11 +174,11 @@ namespace cms_api.Controllers
 
         // POST /update
         [HttpPost("update")]
-        public ActionResult<Response> Update([FromBody] Product value)
+        public ActionResult<Response> Update([FromBody] Portfolio value)
         {
             try
             {
-                new Criteria { code = value.code, title = value.title, updateBy = value.updateBy }.WriteLog("Update", "product");
+                new Criteria { code = value.code, title = value.title, updateBy = value.updateBy }.WriteLog("Update", "portfolio");
             }
             catch (Exception ex)
             {
@@ -179,8 +187,8 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient( "product");
-                var colRegister = new Database().MongoClient<Register>( "register");
+                var col = new Database().MongoClient("portfolio");
+                var colRegister = new Database().MongoClient<Register>("register");
 
                 var filter = Builders<BsonDocument>.Filter.Eq("code", value.code);
 
@@ -203,6 +211,11 @@ namespace cms_api.Controllers
                 doc["description"] = value.description.ConvertStrToHtml();
                 doc["titleEN"] = value.titleEN;
                 doc["descriptionEN"] = value.descriptionEN;
+                doc["progress"] = value.progress;
+                doc["status2"] = value.status2;
+                doc["imageExample"] = value.imageExample;
+                doc["imageBanner"] = value.imageBanner;
+                doc["functionList"] = value.functionList;
 
                 doc["fileUrl"] = value.fileUrl;
                 doc["linkUrl"] = value.linkUrl;
@@ -222,7 +235,7 @@ namespace cms_api.Controllers
                 if (value.isNotification)
                 {
                     new NotificationController().CreateSend(new NotificationSend { username = value.updateBy, category = value.category, reference = value.code });
-                    _ = new NotificationController().PushTopics(new Notification { to = "/topics/all", title = value.title, description = value.description, data = new DataPush { page = "product", code = value.code } });
+                    _ = new NotificationController().PushTopics(new Notification { to = "/topics/all", title = value.title, description = value.description, data = new DataPush { page = "portfolio", code = value.code } });
                 }
 
                 return new Response { status = "S", message = "success", jsonData = doc.ToJson(), objectData = BsonSerializer.Deserialize<object>(doc) };
@@ -235,11 +248,11 @@ namespace cms_api.Controllers
 
         // POST /delete
         [HttpPost("delete")]
-        public ActionResult<Response> Delete([FromBody] Product value)
+        public ActionResult<Response> Delete([FromBody] Portfolio value)
         {
             try
             {
-                var col = new Database().MongoClient( "product");
+                var col = new Database().MongoClient("portfolio");
 
                 var codeList = value.code.Split(",");
 
@@ -247,7 +260,7 @@ namespace cms_api.Controllers
                 {
                     try
                     {
-                        new Criteria { code = code, title = value.title, updateBy = value.updateBy }.WriteLog("Delete", "product");
+                        new Criteria { code = code, title = value.title, updateBy = value.updateBy }.WriteLog("Delete", "portfolio");
                     }
                     catch (Exception ex)
                     {
@@ -258,7 +271,7 @@ namespace cms_api.Controllers
                     col.UpdateOne(filter, update);
 
                 }
-               
+
                 return new Response { status = "S", message = $"code: {value.code} is delete" };
             }
             catch (Exception ex)
@@ -278,7 +291,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient( "ProductGallery");
+                var col = new Database().MongoClient("PortfolioGallery");
 
 
                 value.code = "".toCode();
@@ -323,7 +336,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient( "ProductGallery");
+                var col = new Database().MongoClient("PortfolioGallery");
 
                 {
                     //disable all
@@ -354,7 +367,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient("ProductGalleryFile");
+                var col = new Database().MongoClient("PortfolioGalleryFile");
 
 
                 value.code = "".toCode();
@@ -401,7 +414,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient("ProductGalleryFile");
+                var col = new Database().MongoClient("PortfolioGalleryFile");
 
                 {
                     //disable all
@@ -431,7 +444,7 @@ namespace cms_api.Controllers
         {
             try
             {
-                var col = new Database().MongoClient<Comment>("ProductComment");
+                var col = new Database().MongoClient<Comment>("PortfolioComment");
                 var filter = Builders<Comment>.Filter.Ne("status", "D");
                 //var filter = Builders<Comment>.Filter.Eq(x => x.isActive, true) | Builders<Comment>.Filter.Eq(x => x.isActive, false);
                 if (!string.IsNullOrEmpty(value.code)) { filter = filter & Builders<Comment>.Filter.Regex("reference", value.code); }
@@ -469,7 +482,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient("ProductComment");
+                var col = new Database().MongoClient("PortfolioComment");
 
                 var filter = Builders<BsonDocument>.Filter.Eq("code", value.code);
 
@@ -497,7 +510,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient("ProductComment");
+                var col = new Database().MongoClient("PortfolioComment");
                 var descriptionVerify = value.description;
 
                 try
@@ -529,7 +542,7 @@ namespace cms_api.Controllers
         {
             try
             {
-                var col = new Database().MongoClient("ProductComment");
+                var col = new Database().MongoClient("PortfolioComment");
 
                 var codeList = value.code.Split(",");
 
@@ -558,12 +571,12 @@ namespace cms_api.Controllers
         [HttpPost("category/create")]
         public ActionResult<Response> CategoryCreate([FromBody] Category value)
         {
-            
+
             var doc = new BsonDocument();
 
             try
             {
-                var col = new Database().MongoClient("productCategory");
+                var col = new Database().MongoClient("portfolioCategory");
 
                 //check duplicate
                 value.code = "".toCode();
@@ -608,7 +621,7 @@ namespace cms_api.Controllers
         {
             try
             {
-                var col = new Database().MongoClient<Category>("productCategory");
+                var col = new Database().MongoClient<Category>("portfolioCategory");
 
                 var filter = Builders<Category>.Filter.Ne("status", "D");
                 if (!string.IsNullOrEmpty(value.keySearch))
@@ -624,7 +637,7 @@ namespace cms_api.Controllers
                         filter &= Builders<Category>.Filter.Eq("title", value.category);
                     else
                         if (value.permission != "all")
-                            filter &= value.permission.filterPermission<Category>("code");
+                        filter &= value.permission.filterPermission<Category>("code");
 
                     if (!string.IsNullOrEmpty(value.code)) { filter = filter & Builders<Category>.Filter.Eq("code", value.code); }
                     if (!string.IsNullOrEmpty(value.description)) { filter = filter & Builders<Category>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.description), "i")); }
@@ -638,7 +651,7 @@ namespace cms_api.Controllers
 
                 }
 
-                var docs = col.Find(filter).SortByDescending(o => o.docDate).ThenByDescending(o => o.updateTime).Skip(value.skip).Limit(value.limit).Project(c => new { c.code, c.title,c.titleEN, c.imageUrl, c.createBy, c.createDate, c.isActive, c.updateBy, c.updateDate, c.sequence }).ToList();
+                var docs = col.Find(filter).SortByDescending(o => o.docDate).ThenByDescending(o => o.updateTime).Skip(value.skip).Limit(value.limit).Project(c => new { c.code, c.title, c.titleEN, c.imageUrl, c.createBy, c.createDate, c.isActive, c.updateBy, c.updateDate, c.sequence }).ToList();
 
                 return new Response { status = "S", message = "success", jsonData = docs.ToJson(), objectData = docs, totalData = col.Find(filter).ToList().Count() };
             }
@@ -656,7 +669,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient( "productCategory");
+                var col = new Database().MongoClient("portfolioCategory");
 
                 var filter = Builders<BsonDocument>.Filter.Eq("code", value.code);
                 doc = col.Find(filter).FirstOrDefault();
@@ -675,7 +688,7 @@ namespace cms_api.Controllers
                 // ------- update content ------
                 if (!value.isActive)
                 {
-                    var collectionContent = new Database().MongoClient("product");
+                    var collectionContent = new Database().MongoClient("portfolio");
                     var filterContent = Builders<BsonDocument>.Filter.Eq("category", value.code);
                     var updateContent = Builders<BsonDocument>.Update.Set("isActive", false).Set("status", "N");
                     collectionContent.UpdateMany(filterContent, updateContent);
@@ -687,7 +700,7 @@ namespace cms_api.Controllers
                 {
                     var collectionPermission = new Database().MongoClient("registerPermission");
                     var filterPermission = Builders<BsonDocument>.Filter.Eq("category", value.code);
-                    var updatePermission = Builders<BsonDocument>.Update.Set("ProductPage", false).Set("isActive", false);
+                    var updatePermission = Builders<BsonDocument>.Update.Set("PortfolioPage", false).Set("isActive", false);
                     collectionPermission.UpdateMany(filterPermission, updatePermission);
                 }
                 // ------- end ------
@@ -706,7 +719,7 @@ namespace cms_api.Controllers
         {
             try
             {
-                var col = new Database().MongoClient( "productCategory");
+                var col = new Database().MongoClient("portfolioCategory");
 
                 var filter = Builders<BsonDocument>.Filter.Eq("code", value.code);
                 var update = Builders<BsonDocument>.Update.Set("status", "D").Set("updateBy", value.updateBy).Set("updateDate", DateTime.Now.toStringFromDate());
@@ -715,7 +728,7 @@ namespace cms_api.Controllers
                 // ------- update content ------
                 if (!value.isActive)
                 {
-                    var collectionContent = new Database().MongoClient("product");
+                    var collectionContent = new Database().MongoClient("portfolio");
                     var filterContent = Builders<BsonDocument>.Filter.Eq("category", value.code);
                     var updateContent = Builders<BsonDocument>.Update.Set("isActive", false).Set("status", "D");
                     collectionContent.UpdateMany(filterContent, updateContent);
@@ -727,7 +740,7 @@ namespace cms_api.Controllers
                 {
                     var collectionPermission = new Database().MongoClient("registerPermission");
                     var filterPermission = Builders<BsonDocument>.Filter.Eq("category", value.code);
-                    var updatePermission = Builders<BsonDocument>.Update.Set("ProductPage", false).Set("isActive", false);
+                    var updatePermission = Builders<BsonDocument>.Update.Set("PortfolioPage", false).Set("isActive", false);
                     collectionPermission.UpdateMany(filterPermission, updatePermission);
                 }
                 // ------- end ------
@@ -752,7 +765,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient<BsonDocument>("product");
+                var col = new Database().MongoClient<BsonDocument>("portfolio");
 
                 var codeList = value.code.Split(",");
 
@@ -782,7 +795,7 @@ namespace cms_api.Controllers
             var doc = new BsonDocument();
             try
             {
-                var col = new Database().MongoClient<BsonDocument>("product");
+                var col = new Database().MongoClient<BsonDocument>("portfolio");
                 var arrayFilter = Builders<BsonDocument>.Filter.Ne("sequence", 10) & Builders<BsonDocument>.Filter.Ne("status", "D");
                 var arrayUpdate = Builders<BsonDocument>.Update.Set("sequence", 10).Set("updateBy", value.updateBy).Set("updateDate", DateTime.Now.toStringFromDate()).Set("updateTime", DateTime.Now.toTimeStringFromDate());
 
@@ -806,37 +819,37 @@ namespace cms_api.Controllers
             try
             {
 
-                var col = new Database().MongoClient<Product>("product");
-                var filter = Builders<Product>.Filter.Ne("status", "D");
+                var col = new Database().MongoClient<Portfolio>("portfolio");
+                var filter = Builders<Portfolio>.Filter.Ne("status", "D");
 
                 if (!string.IsNullOrEmpty(value.keySearch))
                 {
-                    filter = (filter & Builders<Product>.Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i"))) | (filter & Builders<Product>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i")));
+                    filter = (filter & Builders<Portfolio>.Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i"))) | (filter & Builders<Portfolio>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.keySearch), "i")));
 
                     if (value.permission != "all")
-                        filter &= (value.permission.filterPermission<Product>("category"));
+                        filter &= (value.permission.filterPermission<Portfolio>("category"));
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(value.category))
-                        filter &= Builders<Product>.Filter.Eq("category", value.category);
+                        filter &= Builders<Portfolio>.Filter.Eq("category", value.category);
                     else
                         if (value.permission != "all")
-                        filter &= (value.permission.filterPermission<Product>("category"));
+                        filter &= (value.permission.filterPermission<Portfolio>("category"));
 
-                    if (!string.IsNullOrEmpty(value.code)) { filter &= Builders<Product>.Filter.Eq("code", value.code); }
-                    if (!string.IsNullOrEmpty(value.status)) { filter = filter & Builders<Product>.Filter.Eq("status", value.status); }
-                    if (!string.IsNullOrEmpty(value.createBy)) { filter = filter & Builders<Product>.Filter.Eq("createBy", value.createBy); }
-                    if (!string.IsNullOrEmpty(value.title)) { filter = filter & Builders<Product>.Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.title), "i")); }
-                    if (!string.IsNullOrEmpty(value.description)) { filter = filter & Builders<Product>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.description), "i")); }
+                    if (!string.IsNullOrEmpty(value.code)) { filter &= Builders<Portfolio>.Filter.Eq("code", value.code); }
+                    if (!string.IsNullOrEmpty(value.status)) { filter = filter & Builders<Portfolio>.Filter.Eq("status", value.status); }
+                    if (!string.IsNullOrEmpty(value.createBy)) { filter = filter & Builders<Portfolio>.Filter.Eq("createBy", value.createBy); }
+                    if (!string.IsNullOrEmpty(value.title)) { filter = filter & Builders<Portfolio>.Filter.Regex("title", new BsonRegularExpression(string.Format(".*{0}.*", value.title), "i")); }
+                    if (!string.IsNullOrEmpty(value.description)) { filter = filter & Builders<Portfolio>.Filter.Regex("description", new BsonRegularExpression(string.Format(".*{0}.*", value.description), "i")); }
                     //if (!string.IsNullOrEmpty(value.language)) { filter = filter & Builders<Product>.Filter.Regex("language", value.language); }
-                    if (!string.IsNullOrEmpty(value.sequence)) { int sequence = Int32.Parse(value.sequence); filter = filter & Builders<Product>.Filter.Eq("sequence", sequence); }
+                    if (!string.IsNullOrEmpty(value.sequence)) { int sequence = Int32.Parse(value.sequence); filter = filter & Builders<Portfolio>.Filter.Eq("sequence", sequence); }
 
                     var ds = value.startDate.toDateFromString().toBetweenDate();
                     var de = value.endDate.toDateFromString().toBetweenDate();
-                    if (value.startDate != "Invalid date" && value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate) && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Product>.Filter.Gt("docDate", ds.start) & Builders<Product>.Filter.Lt("docDate", de.end); }
-                    else if (value.startDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate)) { filter = filter & Builders<Product>.Filter.Gt("docDate", ds.start) & Builders<Product>.Filter.Lt("docDate", ds.end); }
-                    else if (value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Product>.Filter.Gt("docDate", de.start) & Builders<Product>.Filter.Lt("docDate", de.end); }
+                    if (value.startDate != "Invalid date" && value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate) && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Portfolio>.Filter.Gt("docDate", ds.start) & Builders<Portfolio>.Filter.Lt("docDate", de.end); }
+                    else if (value.startDate != "Invalid date" && !string.IsNullOrEmpty(value.startDate)) { filter = filter & Builders<Portfolio>.Filter.Gt("docDate", ds.start) & Builders<Portfolio>.Filter.Lt("docDate", ds.end); }
+                    else if (value.endDate != "Invalid date" && !string.IsNullOrEmpty(value.endDate)) { filter = filter & Builders<Portfolio>.Filter.Gt("docDate", de.start) & Builders<Portfolio>.Filter.Lt("docDate", de.end); }
                 }
 
                 var docs = col.Find(filter).SortBy(o => o.sequence).ThenByDescending(o => o.docDate).ThenByDescending(o => o.updateTime).Project(c => new { c.code, c.center, c.title, c.category, c.isActive, c.createBy, c.createDate, c.updateBy, c.updateDate, c.status }).ToList();
@@ -847,13 +860,13 @@ namespace cms_api.Controllers
                 {
                     #region get master
                     // get category.
-                    var colCategory = new Database().MongoClient<Product>("productCategory");
-                    var filterCategory = Builders<Product>.Filter.Eq("isActive", true);
+                    var colCategory = new Database().MongoClient<Portfolio>("portfolioCategory");
+                    var filterCategory = Builders<Portfolio>.Filter.Eq("isActive", true);
                     var category = colCategory.Find(filterCategory).ToList();
 
                     // get category.
-                    var colCenter = new Database().MongoClient<Product>("mCenter");
-                    var filterCenter = Builders<Product>.Filter.Eq("isActive", true);
+                    var colCenter = new Database().MongoClient<Portfolio>("mCenter");
+                    var filterCenter = Builders<Portfolio>.Filter.Eq("isActive", true);
                     var center = colCenter.Find(filterCenter).Project(c => new { c.code, c.title, c.titleEN }).ToList();
 
                     // get name user role.
@@ -907,5 +920,7 @@ namespace cms_api.Controllers
             }
         }
         #endregion
+
     }
 }
+

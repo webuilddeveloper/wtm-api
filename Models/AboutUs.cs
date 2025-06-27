@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace cms_api.Models
 {
     public class AboutUs : Identity
@@ -17,6 +19,9 @@ namespace cms_api.Models
             latitude = "";
             longitude = "";
             lineOfficial = "";
+            vision = "";
+            visionEN = "";
+            description = "";
         }
 
         public string imageLogoUrl { get; set; }
@@ -31,5 +36,10 @@ namespace cms_api.Models
         public string latitude { get; set; }
         public string longitude { get; set; }
         public string lineOfficial { get; set; }
+        public string vision { get; set; }
+        public string visionEN { get; set; }
+        public List<Identity> missionList { get; set; }
+
+       
     }
 }

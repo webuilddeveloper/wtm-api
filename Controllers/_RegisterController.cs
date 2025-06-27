@@ -461,6 +461,7 @@ namespace cms_api.Controllers
                     { "productPage", value.productPage },
                     { "employeePage", value.employeePage },
                     { "workProcessPage", value.workProcessPage },
+                    { "portfolioPage", value.portfolioPage },
 
                     { "productCategoryPage", value.productCategoryPage },
                     { "employeeCategoryPage", value.employeeCategoryPage },
@@ -666,7 +667,7 @@ namespace cms_api.Controllers
 
                     c.employeePage,
                     c.employeeCategoryPage,
-
+                    c.portfolioPage,
                     c.workProcessPage,
 
                     c.newsCategoryPage,
@@ -824,6 +825,7 @@ namespace cms_api.Controllers
                 doc["productPage"] = value.productPage;
                 doc["employeePage"] = value.employeePage;
                 doc["workProcessPage"] = value.workProcessPage;
+                doc["portfolioPage"] = value.portfolioPage;
 
                 doc["productCategoryPage"] = value.productCategoryPage;
                 doc["employeeCategoryPage"] = value.employeeCategoryPage;
@@ -1003,6 +1005,8 @@ namespace cms_api.Controllers
                     { "productPage", value.productPage},
                     { "employeePage", value.employeePage},
                     { "workProcessPage", value.workProcessPage},
+                    { "portfolioPage", value.portfolioPage},
+                    
 
                     { "lawPage", value.lawPage},
                     { "expertBranchPage", value.expertBranchPage},
@@ -1393,6 +1397,7 @@ namespace cms_api.Controllers
                     employeeCategoryPage = false,
 
                     workProcessPage = false,
+                    portfolioPage = false,
 
                     //report
                     reportNumberMemberRegisterPage = false,
@@ -1462,6 +1467,7 @@ namespace cms_api.Controllers
                         c.employeeCategoryPage,
 
                         c.workProcessPage,
+                        c.portfolioPage,
 
                         //report
                         c.reportNumberMemberRegisterPage,
@@ -1594,7 +1600,8 @@ namespace cms_api.Controllers
                         if (CategoryDoc.employeeCategoryPage) { category.employeeCategoryPage = CategoryDoc.employeeCategoryPage; };
 
                         if (CategoryDoc.workProcessPage) { category.workProcessPage = CategoryDoc.workProcessPage; };
-
+                        if (CategoryDoc.portfolioPage) { category.portfolioPage = CategoryDoc.portfolioPage; };
+                        
                         if (CategoryDoc.newsCategoryPage) { category.newsCategoryPage = CategoryDoc.newsCategoryPage; };
                         if (CategoryDoc.importantCategoryPage) { category.importantCategoryPage = CategoryDoc.importantCategoryPage; };
                         if (CategoryDoc.eventCategoryPage) { category.eventCategoryPage = CategoryDoc.eventCategoryPage; };
@@ -1802,6 +1809,9 @@ namespace cms_api.Controllers
                         case "workProcessPage":
                             CategoryFilter &= Builders<RegisterCategory>.Filter.Eq(x => x.workProcessPage, true);
                             break;
+                        case "portfolioPage":
+                            CategoryFilter &= Builders<RegisterCategory>.Filter.Eq(x => x.portfolioPage, true);
+                            break;
                         default:
                             break;
                     }
@@ -1904,6 +1914,9 @@ namespace cms_api.Controllers
                                 break;
                             case "workProcessPage":
                                 permissionFilter &= Builders<Permission>.Filter.Eq(x => x.workProcessPage, true);
+                                break;
+                            case "portfolioPage":
+                                CategoryFilter &= Builders<RegisterCategory>.Filter.Eq(x => x.portfolioPage, true);
                                 break;
                             default:
                                 break;

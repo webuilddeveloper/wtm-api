@@ -247,7 +247,8 @@ namespace cms_api.Models
         public bool productPage { get; set; }
         public bool employeePage { get; set; }
         public bool workProcessPage { get; set; }
-
+        public bool portfolioPage { get; set; }
+        
 
         public bool byPass { get; set; }
         public string lv0 { get; set; }
