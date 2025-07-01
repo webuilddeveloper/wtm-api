@@ -465,6 +465,7 @@ namespace cms_api.Controllers
                     { "certificatePage", value.certificatePage },
 
                     { "productCategoryPage", value.productCategoryPage },
+                    { "portfolioCategoryPage", value.portfolioCategoryPage },
                     { "employeeCategoryPage", value.employeeCategoryPage },
                     { "certificateCategoryPage", value.certificateCategoryPage },
 
@@ -666,6 +667,7 @@ namespace cms_api.Controllers
 
                     c.productPage,
                     c.productCategoryPage,
+                    c.portfolioCategoryPage,
 
                     c.employeePage,
                     c.employeeCategoryPage,
@@ -833,6 +835,7 @@ namespace cms_api.Controllers
                 doc["certificatePage"] = value.certificatePage;
 
                 doc["productCategoryPage"] = value.productCategoryPage;
+                doc["portfolioCategoryPage"] = value.portfolioCategoryPage;
                 doc["employeeCategoryPage"] = value.employeeCategoryPage;
                 doc["certificateCategoryPage"] = value.certificateCategoryPage;
 
@@ -1400,6 +1403,7 @@ namespace cms_api.Controllers
 
                     productPage = false,
                     productCategoryPage = false,
+                    portfolioCategoryPage =false,
 
                     employeePage = false,
                     employeeCategoryPage = false,
@@ -1480,6 +1484,8 @@ namespace cms_api.Controllers
 
                         c.workProcessPage,
                         c.portfolioPage,
+                        c.portfolioCategoryPage,
+
 
                         //report
                         c.reportNumberMemberRegisterPage,
@@ -1613,6 +1619,7 @@ namespace cms_api.Controllers
 
                         if (CategoryDoc.workProcessPage) { category.workProcessPage = CategoryDoc.workProcessPage; };
                         if (CategoryDoc.portfolioPage) { category.portfolioPage = CategoryDoc.portfolioPage; };
+                        if (CategoryDoc.portfolioCategoryPage) { category.portfolioCategoryPage = CategoryDoc.portfolioCategoryPage; };
 
                         if (CategoryDoc.certificatePage) { category.certificatePage = CategoryDoc.certificatePage; };
                         if (CategoryDoc.certificateCategoryPage) { category.certificateCategoryPage = CategoryDoc.certificateCategoryPage; };
