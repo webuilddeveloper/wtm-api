@@ -134,6 +134,7 @@ namespace mobile_api.Controllers
                             category = c.category,
                             description = c.description,
                             descriptionEN = c.descriptionEN != "" ? c.descriptionEN : c.description,
+                            c.fileUrl,
                             createBy = c.createBy,
                             createDate = c.createDate,
                             createTime = c.createTime,
@@ -187,6 +188,7 @@ namespace mobile_api.Controllers
                         titleEN = c.titleEN,
                         certified = c.certified,
                         imageUrl = c.imageUrl,
+                        c.fileUrl,
                         sequence = c.sequence,
                         category = c.category,
                     }).OrderBy(o => o.sequence).ToList()
