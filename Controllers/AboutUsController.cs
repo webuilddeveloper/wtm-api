@@ -97,7 +97,7 @@ namespace cms_api.Controllers
                 //if (!string.IsNullOrEmpty(value.code)) { filter = filter & Builders<AboutUs>.Filter.Eq("code", value.code); }
                 if (!string.IsNullOrEmpty(codeCenter)) { filter = filter & Builders<AboutUs>.Filter.Eq("center", codeCenter); }
                 else { filter = filter & Builders<AboutUs>.Filter.Eq("center", ""); }
-                var docs = col.Find(filter).Project(c => new { c.code, c.isActive, c.title,c.titleEN, c.imageLogoUrl, c.imageBgUrl, c.description, c.latitude, c.email, c.site, c.longitude, c.address,c.addressEN, c.facebook, c.youtube, c.telephone, c.createBy, c.createDate, c.updateBy, c.updateDate, c.lineOfficial, missionList = (c.missionList ?? Enumerable.Empty<Identity>()).Select(x => new {sequence = x.sequence, title = x.title, titleEN = x.titleEN} ) }).ToList();
+                var docs = col.Find(filter).Project(c => new { c.code, c.isActive, c.title,c.titleEN, c.imageLogoUrl, c.imageBgUrl, c.description, c.descriptionEN, c.vision, c.visionEN, c.latitude, c.email, c.site, c.longitude, c.address,c.addressEN, c.facebook, c.youtube, c.telephone, c.createBy, c.createDate, c.updateBy, c.updateDate, c.lineOfficial, missionList = (c.missionList ?? Enumerable.Empty<Identity>()).Select(x => new {sequence = x.sequence, title = x.title, titleEN = x.titleEN} ) }).ToList();
                 return new Response { status = "S", message = "success", jsonData = docs.ToJson(), objectData = docs };
             }
             catch (Exception ex)
