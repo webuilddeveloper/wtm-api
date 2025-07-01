@@ -462,9 +462,11 @@ namespace cms_api.Controllers
                     { "employeePage", value.employeePage },
                     { "workProcessPage", value.workProcessPage },
                     { "portfolioPage", value.portfolioPage },
+                    { "certificatePage", value.certificatePage },
 
                     { "productCategoryPage", value.productCategoryPage },
                     { "employeeCategoryPage", value.employeeCategoryPage },
+                    { "certificateCategoryPage", value.certificateCategoryPage },
 
 
                     { "newsCategoryPage", value.newsCategoryPage },
@@ -669,6 +671,8 @@ namespace cms_api.Controllers
                     c.employeeCategoryPage,
                     c.portfolioPage,
                     c.workProcessPage,
+                    c.certificatePage,
+                    c.certificateCategoryPage,
 
                     c.newsCategoryPage,
                     c.importantCategoryPage,
@@ -826,9 +830,11 @@ namespace cms_api.Controllers
                 doc["employeePage"] = value.employeePage;
                 doc["workProcessPage"] = value.workProcessPage;
                 doc["portfolioPage"] = value.portfolioPage;
+                doc["certificatePage"] = value.certificatePage;
 
                 doc["productCategoryPage"] = value.productCategoryPage;
                 doc["employeeCategoryPage"] = value.employeeCategoryPage;
+                doc["certificateCategoryPage"] = value.certificateCategoryPage;
 
                 doc["policyApplicationPage"] = value.policyApplicationPage;
                 doc["policyMarketingPage"] = value.policyMarketingPage;
@@ -1006,7 +1012,8 @@ namespace cms_api.Controllers
                     { "employeePage", value.employeePage},
                     { "workProcessPage", value.workProcessPage},
                     { "portfolioPage", value.portfolioPage},
-                    
+                    { "certificatePage", value.certificatePage},
+
 
                     { "lawPage", value.lawPage},
                     { "expertBranchPage", value.expertBranchPage},
@@ -1074,6 +1081,7 @@ namespace cms_api.Controllers
                                      .Lookup("seminarCategory", "category", "code", "seminarCategoryList")
                                      .Lookup("productCategory", "category", "code", "productCategoryList")
                                      .Lookup("employeeCategory", "category", "code", "employeeCategoryList")
+                                     .Lookup("certificateCategory", "category", "code", "certificateCategoryList")
                                      .As<Permission>()
                                      .ToList();
 
@@ -1395,6 +1403,8 @@ namespace cms_api.Controllers
 
                     employeePage = false,
                     employeeCategoryPage = false,
+                    certificatePage = false,
+                    certificateCategoryPage = false,
 
                     workProcessPage = false,
                     portfolioPage = false,
@@ -1465,6 +1475,8 @@ namespace cms_api.Controllers
 
                         c.employeePage,
                         c.employeeCategoryPage,
+                        c.certificatePage,
+                        c.certificateCategoryPage,
 
                         c.workProcessPage,
                         c.portfolioPage,
@@ -1601,7 +1613,10 @@ namespace cms_api.Controllers
 
                         if (CategoryDoc.workProcessPage) { category.workProcessPage = CategoryDoc.workProcessPage; };
                         if (CategoryDoc.portfolioPage) { category.portfolioPage = CategoryDoc.portfolioPage; };
-                        
+
+                        if (CategoryDoc.certificatePage) { category.certificatePage = CategoryDoc.certificatePage; };
+                        if (CategoryDoc.certificateCategoryPage) { category.certificateCategoryPage = CategoryDoc.certificateCategoryPage; };
+
                         if (CategoryDoc.newsCategoryPage) { category.newsCategoryPage = CategoryDoc.newsCategoryPage; };
                         if (CategoryDoc.importantCategoryPage) { category.importantCategoryPage = CategoryDoc.importantCategoryPage; };
                         if (CategoryDoc.eventCategoryPage) { category.eventCategoryPage = CategoryDoc.eventCategoryPage; };
@@ -1812,6 +1827,9 @@ namespace cms_api.Controllers
                         case "portfolioPage":
                             CategoryFilter &= Builders<RegisterCategory>.Filter.Eq(x => x.portfolioPage, true);
                             break;
+                        case "certificatePage":
+                            CategoryFilter &= Builders<RegisterCategory>.Filter.Eq(x => x.certificatePage, true);
+                            break;
                         default:
                             break;
                     }
@@ -1917,6 +1935,9 @@ namespace cms_api.Controllers
                                 break;
                             case "portfolioPage":
                                 CategoryFilter &= Builders<RegisterCategory>.Filter.Eq(x => x.portfolioPage, true);
+                                break;
+                            case "certificatePage":
+                                permissionFilter &= Builders<Permission>.Filter.Eq(x => x.certificatePage, true);
                                 break;
                             default:
                                 break;

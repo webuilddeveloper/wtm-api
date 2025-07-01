@@ -141,6 +141,7 @@ namespace cms_api.Models
 
         public bool productCategoryPage { get; set; }
         public bool employeeCategoryPage { get; set; }
+        public bool certificateCategoryPage { get; set; }
 
     }
 
