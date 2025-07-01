@@ -13,11 +13,11 @@ namespace cms_api.Models
         {
             imageUrl = "";
             imageUrlCreateBy = "";
-            position = "";
+            certified = "";
         }
 
         public string imageUrl { get; set; }
         public string imageUrlCreateBy { get; set; }
-        public string position { get; set; }
+        public string certified { get; set; }
     }
 }

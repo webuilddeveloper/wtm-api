@@ -58,7 +58,7 @@ namespace cms_api.Controllers
                     { "title", value.title },
                     { "titleEN", value.titleEN },
                     { "imageUrl", value.imageUrl },
-                    { "position", value.position },
+                    { "certified", value.certified },
                     { "category", value.category },
                     { "language", value.language },
                     { "description", value.description.ConvertStrToHtml() },
@@ -199,7 +199,7 @@ namespace cms_api.Controllers
                 doc["description"] = value.description.ConvertStrToHtml();
                 doc["titleEN"] = value.titleEN;
                 doc["descriptionEN"] = value.descriptionEN;
-                doc["position"] = value.position;
+                doc["certified"] = value.certified;
 
                 doc["fileUrl"] = value.fileUrl;
                 doc["linkUrl"] = value.linkUrl;
